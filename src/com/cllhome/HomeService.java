@@ -49,8 +49,8 @@ public class HomeService extends Service {
 
 		view.setOnTouchListener(new OnTouchListener() {
 			float[] temp = new float[] { 0f, 0f };
-			boolean moved = false;
-			long ts = 0;
+			long upTs = 0;
+			long downTs = 0;
 			boolean ignoreThis = false;
 			Handler handler = new Handler();
 			Runnable r = new Runnable() {
@@ -72,7 +72,7 @@ public class HomeService extends Service {
 				int eventaction = event.getAction();
 				switch (eventaction) {
 				case MotionEvent.ACTION_DOWN:
-					moved = false;
+					downTs = SystemClock.uptimeMillis();
 					temp[0] = event.getX();
 					temp[1] = event.getY();
 					return true;
@@ -80,21 +80,21 @@ public class HomeService extends Service {
 				case MotionEvent.ACTION_MOVE:
 					refreshView((int) (event.getRawX() - temp[0]),
 							(int) (event.getRawY() - temp[1]));
-					moved = true;
 					return true;
 
 				case MotionEvent.ACTION_UP:
-					if (!moved) {
+					long cur = SystemClock.uptimeMillis();
+					System.out.println(cur - downTs);
+					if (cur - downTs < 200) {
 						ignoreThis = false;
-						long cur = SystemClock.uptimeMillis();
 						if (Prefs.isEnableLock(getBaseContext())
-								&& cur - ts < 300) {
-							System.out.println(cur - ts);
+								&& cur - upTs < 300) {
+							System.out.println(cur - upTs);
 							ignoreThis = true;
 							lock();
 							return true;
 						}
-						ts = cur;
+						upTs = cur;
 						handler.postDelayed(r, 300);
 						return true;
 					}
