@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.view.Gravity;
@@ -50,6 +51,21 @@ public class HomeService extends Service {
 			float[] temp = new float[] { 0f, 0f };
 			boolean moved = false;
 			long ts = 0;
+			boolean ignoreThis = false;
+			Handler handler = new Handler();
+			Runnable r = new Runnable() {
+
+				public void run() {
+					if (ignoreThis) {
+						ignoreThis = true;
+						return;
+					}
+					Intent intent = new Intent(Intent.ACTION_MAIN);
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intent.addCategory(Intent.CATEGORY_HOME);
+					startActivity(intent);
+				}
+			};
 
 			public boolean onTouch(View v, MotionEvent event) {
 				layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
@@ -59,7 +75,6 @@ public class HomeService extends Service {
 					moved = false;
 					temp[0] = event.getX();
 					temp[1] = event.getY();
-					System.out.println("+" + ts);
 					return true;
 
 				case MotionEvent.ACTION_MOVE:
@@ -70,17 +85,17 @@ public class HomeService extends Service {
 
 				case MotionEvent.ACTION_UP:
 					if (!moved) {
+						ignoreThis = false;
 						long cur = SystemClock.uptimeMillis();
 						if (Prefs.isEnableLock(getBaseContext())
-								&& cur - ts < 500) {
+								&& cur - ts < 300) {
+							System.out.println(cur - ts);
+							ignoreThis = true;
 							lock();
 							return true;
 						}
 						ts = cur;
-						Intent intent = new Intent(Intent.ACTION_MAIN);
-						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intent.addCategory(Intent.CATEGORY_HOME);
-						startActivity(intent);
+						handler.postDelayed(r, 300);
 						return true;
 					}
 				}
