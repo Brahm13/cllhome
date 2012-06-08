@@ -1,7 +1,9 @@
 package com.cllhome;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
@@ -19,6 +21,7 @@ public class HomeService extends Service {
 	private boolean viewAdded = false;
 	private WindowManager windowManager;
 	private WindowManager.LayoutParams layoutParams;
+	private BroadcastReceiver r;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -68,6 +71,9 @@ public class HomeService extends Service {
 			}
 		});
 
+		r = new Hallo(this);
+		registerReceiver(r, new IntentFilter(Intent.ACTION_USER_PRESENT));
+		registerReceiver(r, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 	}
 
 	public void refreshView(int x, int y) {
@@ -83,7 +89,7 @@ public class HomeService extends Service {
 		refresh();
 	}
 
-	private void refresh() {
+	public void refresh() {
 		if (viewAdded) {
 			windowManager.updateViewLayout(view, layoutParams);
 		} else {
@@ -95,7 +101,7 @@ public class HomeService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		refresh();
-		return super.onStartCommand(intent, flags, startId);
+		return START_STICKY;
 	}
 
 	public void removeView() {
@@ -109,5 +115,7 @@ public class HomeService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		removeView();
+		unregisterReceiver(r);
 	}
+
 }

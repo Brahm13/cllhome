@@ -15,11 +15,12 @@
                 <action android:name="com.cllhome.home"/>
             </intent-filter>
         </service>
-        <receiver android:name="Hallo">
+        <activity android:name="HomeActivity">
             <intent-filter>
-                <action android:name="android.intent.action.USER_PRESENT"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
-        </receiver>
+        </activity>
     </application>
 
 </manifest>
