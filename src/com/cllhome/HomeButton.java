@@ -26,8 +26,9 @@ public class HomeButton extends View {
 
 	private void initHomeButton() {
 		hp = new Paint();
+		hp.setAntiAlias(true);
 		hp.setColor(R.color.bg);
-		hp.setStrokeWidth(1);
+		hp.setStrokeWidth(2);
 		hp.setStyle(Paint.Style.FILL_AND_STROKE);
 	}
 
