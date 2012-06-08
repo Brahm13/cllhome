@@ -36,7 +36,7 @@ public class HomeService extends Service {
 
 		layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT, LayoutParams.TYPE_SYSTEM_ERROR,
-				LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSPARENT);
+				LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
 		layoutParams.gravity = Gravity.LEFT | Gravity.CENTER;
 
 		view.setOnTouchListener(new OnTouchListener() {

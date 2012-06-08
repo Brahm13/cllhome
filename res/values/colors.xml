@@ -1,4 +1,6 @@
 
     <resources>
-        <color name="bg">#F555</color>
+        <color name="cs3">#6BFFFFFF</color>
+        <color name="cs2">#8FAAAAAA</color>
+        <color name="cs1">#AF00BFFF</color>
     </resources>
