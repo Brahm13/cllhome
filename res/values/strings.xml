@@ -3,5 +3,6 @@
 
     <string name="home">Home</string>
     <string name="app_name">Cllhome</string>
+    <string name="enableLock">Enable Lock</string>
 
 </resources>

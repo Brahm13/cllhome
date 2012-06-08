@@ -1,12 +1,16 @@
 package com.cllhome;
 
 import android.app.Service;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,6 +26,9 @@ public class HomeService extends Service {
 	private WindowManager windowManager;
 	private WindowManager.LayoutParams layoutParams;
 	private BroadcastReceiver r;
+
+	private DevicePolicyManager policyManager;
+	private ComponentName componentName;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -42,6 +49,7 @@ public class HomeService extends Service {
 		view.setOnTouchListener(new OnTouchListener() {
 			float[] temp = new float[] { 0f, 0f };
 			boolean moved = false;
+			long ts = 0;
 
 			public boolean onTouch(View v, MotionEvent event) {
 				layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
@@ -51,29 +59,48 @@ public class HomeService extends Service {
 					moved = false;
 					temp[0] = event.getX();
 					temp[1] = event.getY();
-					break;
+					System.out.println("+" + ts);
+					return true;
 
 				case MotionEvent.ACTION_MOVE:
 					refreshView((int) (event.getRawX() - temp[0]),
 							(int) (event.getRawY() - temp[1]));
 					moved = true;
-					break;
+					return true;
 
 				case MotionEvent.ACTION_UP:
 					if (!moved) {
+						long cur = SystemClock.uptimeMillis();
+						if (Prefs.isEnableLock(getBaseContext())
+								&& cur - ts < 500) {
+							lock();
+							return true;
+						}
+						ts = cur;
 						Intent intent = new Intent(Intent.ACTION_MAIN);
 						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						intent.addCategory(Intent.CATEGORY_HOME);
 						startActivity(intent);
+						return true;
 					}
 				}
-				return true;
+				return false;
 			}
 		});
 
 		r = new Hallo(this);
 		registerReceiver(r, new IntentFilter(Intent.ACTION_USER_PRESENT));
 		registerReceiver(r, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+
+		policyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+		componentName = new ComponentName(this, AdminReceiver.class);
+	}
+
+	private void lock() {
+		boolean active = policyManager.isAdminActive(componentName);
+		if (active) {
+			policyManager.lockNow();
+		}
 	}
 
 	public void refreshView(int x, int y) {

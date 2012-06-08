@@ -16,7 +16,7 @@
                 <action android:name="com.cllhome.home"/>
             </intent-filter>
         </service>
-        <activity android:name="HomeActivity">
+        <activity android:name=".PrefsActivity">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <action android:name="android.intent.action.MAIN"/>
@@ -26,6 +26,18 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
+        </receiver>
+        <activity android:name="LockActivity">
+            <intent-filter>
+                <action android:name="com.cllhome.lock"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <receiver android:name="AdminReceiver" android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+            </intent-filter>
+            <meta-data android:resource="@xml/admin" android:name="android.app.device_admin"/>
         </receiver>
     </application>
 
